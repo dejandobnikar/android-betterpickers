@@ -93,7 +93,6 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
 
     private AccessibleDateAnimator mAnimator;
     private LinearLayout mSelectedDateLayout;
-    private View mDayOfWeekContainer;
     private TextView mDayOfWeekView;
     private LinearLayout mMonthAndDayView;
     private TextView mSelectedMonthTextView;
@@ -239,7 +238,6 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
 
         mSelectedDateLayout = (LinearLayout) view.findViewById(R.id.day_picker_selected_date_layout);
         mDayOfWeekView = (TextView) view.findViewById(R.id.date_picker_header);
-        mDayOfWeekContainer = view.findViewById(R.id.header_container);
         mMonthAndDayView = (LinearLayout) view.findViewById(R.id.date_picker_month_and_day);
         mMonthAndDayView.setOnClickListener(this);
         mSelectedMonthTextView = (TextView) view.findViewById(R.id.date_picker_month);
@@ -370,8 +368,8 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         mYearView.setBackgroundColor(headerBackgroundColor);
         mMonthAndDayView.setBackgroundColor(headerBackgroundColor);
 
-        if (mDayOfWeekContainer != null) {
-            mDayOfWeekContainer.setBackgroundColor(preHeaderBackgroundColor);
+        if (mDayOfWeekView != null) {
+            mDayOfWeekView.setBackgroundColor(preHeaderBackgroundColor);
         }
 
         view.setBackgroundColor(bodyBgColor);
@@ -417,9 +415,12 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
 
                 mSelectYearTitle.setAlpha(0f);
                 mMonthAndDayView.setAlpha(1f);
-                mDayOfWeekView.setAlpha(1f);
                 doneButton.setText(mDoneText);
                 cancelButton.setText(mBackText);
+                if (mDayOfWeekView != null) {
+                    mDayOfWeekView.setText(mCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG,
+                            Locale.getDefault()).toUpperCase(Locale.getDefault()));
+                }
 
                 int flags = DateUtils.FORMAT_SHOW_DATE;
                 String dayString = DateUtils.formatDateTime(getActivity(), millis, flags);
@@ -435,9 +436,11 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
 
                 mSelectYearTitle.setAlpha(1f);
                 mMonthAndDayView.setAlpha(0f);
-                mDayOfWeekView.setAlpha(0f);
                 doneButton.setText(mNextText);
                 cancelButton.setText(mCancelText);
+                if (mDayOfWeekView != null) {
+                    mDayOfWeekView.setText(null);
+                }
 
                 mYearPickerView.onDateChanged();
                 if (mCurrentView != viewIndex) {
