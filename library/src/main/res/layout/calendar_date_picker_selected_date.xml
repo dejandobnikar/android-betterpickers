@@ -24,40 +24,58 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <com.codetroopers.betterpickers.widget.AccessibleLinearLayout
-        android:id="@+id/date_picker_month_and_day"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:clickable="true"
-        android:orientation="vertical"
-        android:textColor="@color/date_picker_selector">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/date_picker_month"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:duplicateParentState="true"
-            android:gravity="center_horizontal|bottom"
-            android:includeFontPadding="false"
-            android:textColor="@color/date_picker_selector"
-            android:textSize="@dimen/selected_date_month_size"
-            tools:text="Jan."/>
-
-        <TextView
-            android:id="@+id/date_picker_day"
+        <com.codetroopers.betterpickers.widget.AccessibleLinearLayout
+            android:id="@+id/date_picker_month_and_day"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="-10dip"
-            android:layout_marginTop="-10dip"
-            android:duplicateParentState="true"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:textColor="@color/date_picker_selector">
+
+            <TextView
+                android:id="@+id/date_picker_month"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:duplicateParentState="true"
+                android:gravity="center_horizontal|bottom"
+                android:includeFontPadding="false"
+                android:textColor="@color/date_picker_selector"
+                android:textSize="@dimen/selected_date_month_size"
+                tools:text="Jan."/>
+
+            <TextView
+                android:id="@+id/date_picker_day"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="-10dip"
+                android:layout_marginTop="-10dip"
+                android:duplicateParentState="true"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textColor="@color/date_picker_selector"
+                android:textSize="@dimen/selected_date_day_size"
+                tools:text="31"/>
+        </com.codetroopers.betterpickers.widget.AccessibleLinearLayout>
+
+        <TextView
+            android:id="@+id/tv_select_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:gravity="center"
-            android:includeFontPadding="false"
-            android:textColor="@color/date_picker_selector"
-            android:textSize="@dimen/selected_date_day_size"
-            tools:text="31"/>
-    </com.codetroopers.betterpickers.widget.AccessibleLinearLayout>
+            android:padding="@dimen/body_font_padding"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:textSize="18dp"
+            android:text="@string/select_year_title"/>
+
+    </FrameLayout>
 
     <com.codetroopers.betterpickers.widget.AccessibleTextView
         android:id="@+id/date_picker_year"

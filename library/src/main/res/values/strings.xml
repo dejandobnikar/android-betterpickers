@@ -2,6 +2,8 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="picker_cancel">Cancel</string>
     <string name="picker_set">OK</string>
+    <string name="picker_next">Next</string>
+    <string name="picker_back">Back</string>
     <string name="hours_label">h</string>
     <string name="minutes_label">m</string>
     <string name="seconds_label">s</string>
@@ -24,6 +26,8 @@
     <string name="month_c">MONTH</string>
     <string name="day_c">DAY</string>
     <string name="year_c">YEAR</string>
+
+    <string name="select_year_title">Select year:</string>
 
     <!-- 1.3.1 -->
     <string name="min_error">Please input a number greater than or equal to %1$s</string>

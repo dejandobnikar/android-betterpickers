@@ -30,6 +30,7 @@ public class SampleCalendarDateBasicUsage extends BaseSampleActivity
             @Override
             public void onClick(View v) {
                 CalendarDatePickerDialogFragment cdp = new CalendarDatePickerDialogFragment()
+                        .setShowYearView()
                         .setOnDateSetListener(SampleCalendarDateBasicUsage.this);
                 cdp.show(getSupportFragmentManager(), FRAG_TAG_DATE_PICKER);
             }

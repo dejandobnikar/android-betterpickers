@@ -93,6 +93,7 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
 
     private AccessibleDateAnimator mAnimator;
     private LinearLayout mSelectedDateLayout;
+    private View mDayOfWeekContainer;
     private TextView mDayOfWeekView;
     private LinearLayout mMonthAndDayView;
     private TextView mSelectedMonthTextView;
@@ -100,13 +101,17 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
     private TextView mYearView;
     private DayPickerView mDayPickerView;
     private YearPickerView mYearPickerView;
+    private TextView mSelectYearTitle;
 
+    private int mInitView = MONTH_AND_DAY_VIEW;
     private int mCurrentView = UNINITIALIZED;
     private int mWeekStart = mCalendar.getFirstDayOfWeek();
     private CalendarDay mMinDate = DEFAULT_START_DATE;
     private CalendarDay mMaxDate = DEFAULT_END_DATE;
     private String mDoneText;
     private String mCancelText;
+    private String mNextText;
+    private String mBackText;
 
     private SparseArray<CalendarDay> mDisabledDays;
 
@@ -122,6 +127,8 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
     private int mStyleResId;
     private int mSelectedColor;
     private int mUnselectedColor;
+    private Button doneButton;
+    private Button cancelButton;
 
     /**
      * The callback used to indicate the user is done filling in the date.
@@ -232,16 +239,18 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
 
         mSelectedDateLayout = (LinearLayout) view.findViewById(R.id.day_picker_selected_date_layout);
         mDayOfWeekView = (TextView) view.findViewById(R.id.date_picker_header);
+        mDayOfWeekContainer = view.findViewById(R.id.header_container);
         mMonthAndDayView = (LinearLayout) view.findViewById(R.id.date_picker_month_and_day);
         mMonthAndDayView.setOnClickListener(this);
         mSelectedMonthTextView = (TextView) view.findViewById(R.id.date_picker_month);
         mSelectedDayTextView = (TextView) view.findViewById(R.id.date_picker_day);
+        mSelectYearTitle = (TextView) view.findViewById(R.id.tv_select_year);
         mYearView = (TextView) view.findViewById(R.id.date_picker_year);
         mYearView.setOnClickListener(this);
 
         int listPosition = -1;
         int listPositionOffset = 0;
-        int currentView = MONTH_AND_DAY_VIEW;
+        int currentView = mInitView;
         if (savedInstanceState != null) {
             mWeekStart = savedInstanceState.getInt(KEY_WEEK_START);
             mMinDate = new CalendarDay(savedInstanceState.getLong(KEY_DATE_START));
@@ -255,7 +264,11 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
 
         final Activity activity = getActivity();
         mDayPickerView = new SimpleDayPickerView(activity, this);
+        mDayPickerView.setVerticalScrollBarEnabled(true);
+        mDayPickerView.setScrollbarFadingEnabled(false);
         mYearPickerView = new YearPickerView(activity, this);
+        mYearPickerView.setVerticalScrollBarEnabled(true);
+        mYearPickerView.setScrollbarFadingEnabled(false);
 
         Resources res = getResources();
         TypedArray themeColors = getActivity().obtainStyledAttributes(mStyleResId, R.styleable.BetterPickersDialogs);
@@ -263,6 +276,8 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         mSelectDay = res.getString(R.string.select_day);
         mYearPickerDescription = res.getString(R.string.year_picker_description);
         mSelectYear = res.getString(R.string.select_year);
+        mNextText = res.getString(R.string.picker_next);
+        mBackText = res.getString(R.string.picker_back);
 
         int headerBackgroundColor = themeColors.getColor(R.styleable.BetterPickersDialogs_bpHeaderBackgroundColor, ContextCompat.getColor(getActivity(), R.color.bpWhite));
         int preHeaderBackgroundColor = themeColors.getColor(R.styleable.BetterPickersDialogs_bpPreHeaderBackgroundColor, ContextCompat.getColor(getActivity(), R.color.bpWhite));
@@ -272,6 +287,7 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         mSelectedColor = themeColors.getColor(R.styleable.BetterPickersDialogs_bpHeaderSelectedTextColor, ContextCompat.getColor(getActivity(), R.color.bpWhite));
         mUnselectedColor = themeColors.getColor(R.styleable.BetterPickersDialogs_bpHeaderUnselectedTextColor, ContextCompat.getColor(getActivity(), R.color.radial_gray_light));
 
+        mSelectYearTitle.setTextColor(mSelectedColor);
 
         mAnimator = (AccessibleDateAnimator) view.findViewById(R.id.animator);
         mAnimator.addView(mDayPickerView);
@@ -286,34 +302,50 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         animation2.setDuration(ANIMATION_DURATION);
         mAnimator.setOutAnimation(animation2);
 
-        Button doneButton = (Button) view.findViewById(R.id.done_button);
+        doneButton = (Button) view.findViewById(R.id.done_button);
         if (mDoneText != null) {
             doneButton.setText(mDoneText);
+        } else {
+            mDoneText = res.getString(R.string.picker_set);
         }
+
         doneButton.setTextColor(buttonTextColor);
         doneButton.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 tryVibrate();
-                if (mCallBack != null) {
-                    mCallBack.onDateSet(CalendarDatePickerDialogFragment.this, mCalendar.get(Calendar.YEAR),
-                            mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH));
+
+                if (mCurrentView != MONTH_AND_DAY_VIEW) {
+                    setCurrentView(MONTH_AND_DAY_VIEW);
+                } else {
+                    if (mCallBack != null) {
+                        mCallBack.onDateSet(CalendarDatePickerDialogFragment.this, mCalendar.get(Calendar.YEAR),
+                                mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH));
+                    }
+                    dismiss();
                 }
-                dismiss();
             }
         });
-        Button cancelButton = (Button) view.findViewById(R.id.cancel_button);
+        cancelButton = (Button) view.findViewById(R.id.cancel_button);
         if (mCancelText != null) {
             cancelButton.setText(mCancelText);
+        } else {
+            mCancelText = res.getString(R.string.picker_cancel);
         }
+
         cancelButton.setTextColor(buttonTextColor);
         cancelButton.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 tryVibrate();
-                dismiss();
+
+                if (mCurrentView == MONTH_AND_DAY_VIEW) {
+                    setCurrentView(YEAR_VIEW);
+                } else {
+                    dismiss();
+                }
             }
         });
         view.findViewById(R.id.ok_cancel_buttons_layout).setBackgroundColor(buttonBgColor);
@@ -338,9 +370,10 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         mYearView.setBackgroundColor(headerBackgroundColor);
         mMonthAndDayView.setBackgroundColor(headerBackgroundColor);
 
-        if (mDayOfWeekView != null) {
-            mDayOfWeekView.setBackgroundColor(preHeaderBackgroundColor);
+        if (mDayOfWeekContainer != null) {
+            mDayOfWeekContainer.setBackgroundColor(preHeaderBackgroundColor);
         }
+
         view.setBackgroundColor(bodyBgColor);
         mYearPickerView.setBackgroundColor(bodyBgColor);
         mDayPickerView.setBackgroundColor(bodyBgColor);
@@ -382,6 +415,12 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
                 }
                 pulseAnimator.start();
 
+                mSelectYearTitle.setAlpha(0f);
+                mMonthAndDayView.setAlpha(1f);
+                mDayOfWeekView.setAlpha(1f);
+                doneButton.setText(mDoneText);
+                cancelButton.setText(mBackText);
+
                 int flags = DateUtils.FORMAT_SHOW_DATE;
                 String dayString = DateUtils.formatDateTime(getActivity(), millis, flags);
                 mAnimator.setContentDescription(mDayPickerDescription + ": " + dayString);
@@ -393,6 +432,13 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
                     pulseAnimator.setStartDelay(ANIMATION_DELAY);
                     mDelayAnimation = false;
                 }
+
+                mSelectYearTitle.setAlpha(1f);
+                mMonthAndDayView.setAlpha(0f);
+                mDayOfWeekView.setAlpha(0f);
+                doneButton.setText(mNextText);
+                cancelButton.setText(mCancelText);
+
                 mYearPickerView.onDateChanged();
                 if (mCurrentView != viewIndex) {
                     mMonthAndDayView.setSelected(false);
@@ -499,6 +545,11 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
 
     public CalendarDatePickerDialogFragment setOnDismissListener(OnDialogDismissListener ondialogdismisslistener) {
         mDimissCallback = ondialogdismisslistener;
+        return this;
+    }
+
+    public CalendarDatePickerDialogFragment setShowYearView() {
+        mInitView = YEAR_VIEW;
         return this;
     }
 
